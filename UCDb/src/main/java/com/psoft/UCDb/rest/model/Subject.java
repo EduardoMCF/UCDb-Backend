@@ -1,70 +1,139 @@
 package com.psoft.UCDb.rest.model;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+import lombok.Data;
+
+@Data
+@Entity
 public class Subject {
-	private String name;
+	@Id
 	private int id;
-	private int number_Of_Comments;
-	private int number_Of_Likes;
-	private int number_Of_Deslikes;
-	private int number_Of_Rates;
-	private double rate;
+	private String name;
+	private HashSet<User> usersThatLiked;
+	private HashSet<User> usersThatDisliked;
+	private int commentId;
+	private HashMap<Integer,Comment> comments;
+	private List<Double> rates;
 
 	public Subject() {
 
 	}
 
-	public Subject(String name, int d) {
+	public Subject(int id, String name) {
 		this.name = name;
 		this.id = id;
-		this.number_Of_Comments = 0;
-		this.number_Of_Deslikes = 0;
-		this.number_Of_Likes = 0;
-		this.rate = 0;
-		this.number_Of_Rates = 0;
+		this.usersThatLiked = new HashSet<User>();
+		this.usersThatDisliked = new HashSet<User>();
+		this.commentId = 0;
+		this.comments = new HashMap<Integer,Comment>();
+		this.rates = new ArrayList<Double>();
+		
+	}
+	
+	public int getId() {
+		return this.id;
 	}
 
 	public String getName() {
 		return this.name;
 	}
-
-	public int getNumber_Of_Comments() {
-		return this.number_Of_Comments;
+	
+	public int getNumberOfLikes() {
+		return this.usersThatLiked.size();
+	}
+	
+	public HashSet<User> getUsersThatLiked() {
+		return this.usersThatLiked;
+	}
+	
+	public int getNumberOfDislikes() {
+		return this.usersThatDisliked.size();
+	}
+	
+	public HashSet<User> getUsersThatDisliked() {
+		return this.usersThatDisliked;
 	}
 
-	public int getId() {
-		return this.id;
+	public int getNumberOfComments() {
+		return this.comments.size();
+	}
+	
+	public HashMap<Integer,Comment> getComments() {
+		return this.comments;
 	}
 
-	public int getNumber_Of_Likes() {
-		return this.number_Of_Likes;
-	}
-
-	public int getNumber_Of_Deslikes() {
-		return this.number_Of_Deslikes;
-	}
-
-	public double getRate() {
-		return this.rate;
-	}
-
-	public void setNumber_Of_Comments(int comments) {
-		this.number_Of_Comments += 1;
-	}
-
-	public void setNumber_Of_Likes(int likes) {
-		this.number_Of_Likes += 1;
-	}
-
-	public void setNumber_Of_Deslikes(int deslikes) {
-		this.number_Of_Deslikes += 1;
-	}
-
-	public void setRate(double rate) {
-		this.rate = rate; // vamos precisar armazanar a quantidade de pessoas que votaram pra poder fazer
-							// a media
-	}
-	private double calculate_Rate() {
-		return (Double) null;
+	public Double getRate() {
+		Double sum = 0.0;
+		for (Double rate : rates) {
+			sum += rate;
+		}
 		
+		return sum / this.rates.size();
 	}
+	
+	public void setLike(User user) {
+		if (!this.usersThatDisliked.contains(user)) {
+			
+			if (this.usersThatLiked.contains(user)) 
+				this.usersThatLiked.remove(user);
+			else 
+				this.usersThatLiked.add(user);
+		
+		} else {
+			this.usersThatDisliked.remove(user);
+			this.usersThatLiked.add(user);
+		}
+	}
+	
+	public void setDislike(User user) {
+		if (!this.usersThatLiked.contains(user)) {
+					
+			if (this.usersThatDisliked.contains(user)) 
+				this.usersThatDisliked.remove(user);
+			else 
+				this.usersThatDisliked.add(user);
+		
+		} else {
+			this.usersThatLiked.remove(user);
+			this.usersThatDisliked.add(user);
+		}
+	}
+
+	public void addComment(Comment comment) {
+		if (!this.comments.containsValue(comment)) {
+			this.comments.put(this.commentId, comment);
+			this.commentId += 1;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Subject other = (Subject) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}
+	
+	
 }
