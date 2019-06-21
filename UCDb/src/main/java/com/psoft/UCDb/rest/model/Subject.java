@@ -4,9 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import lombok.Data;
 
@@ -16,10 +22,15 @@ public class Subject {
 	@Id
 	private int id;
 	private String name;
-	private HashSet<User> usersThatLiked;
-	private HashSet<User> usersThatDisliked;
+	@ManyToMany
+	@JoinTable
+	private Set<User> usersThatLiked;
+	@ManyToMany
+	@JoinTable
+	private Set<User> usersThatDisliked;
 	private int commentId;
-	private HashMap<Integer,Comment> comments;
+	@OneToMany
+	private Map<Integer,Comment> comments;
 	private List<Double> rates;
 
 	public Subject() {
@@ -49,7 +60,7 @@ public class Subject {
 		return this.usersThatLiked.size();
 	}
 	
-	public HashSet<User> getUsersThatLiked() {
+	public Set<User> getUsersThatLiked() {
 		return this.usersThatLiked;
 	}
 	
@@ -57,7 +68,7 @@ public class Subject {
 		return this.usersThatDisliked.size();
 	}
 	
-	public HashSet<User> getUsersThatDisliked() {
+	public Set<User> getUsersThatDisliked() {
 		return this.usersThatDisliked;
 	}
 
@@ -65,7 +76,7 @@ public class Subject {
 		return this.comments.size();
 	}
 	
-	public HashMap<Integer,Comment> getComments() {
+	public Map<Integer,Comment> getComments() {
 		return this.comments;
 	}
 

@@ -14,9 +14,9 @@ import com.psoft.UCDb.rest.model.User;
 @Repository
 public interface CommentDAO extends JpaRepository<Comment, CommentId>{
 	Comment save(Comment comment);
-	@Query(value="Select c from Comment c where c.msg=:pmsg AND c.user=:puser AND c.date=:pdate")
-	Comment findById(@Param("pmsg") String msg, @Param("puser") User user, @Param("pdate") Date date);
+	@Query(value="Select c from Comment c where c.msg=:pmsg AND c.userEmail=:puserEmail AND c.date=:pdate")
+	Comment findById(@Param("pmsg") String msg, @Param("puserEmail") String userEmail, @Param("pdate") Date date);
 	
-	@Query(value="Update Comment Set deleted = true where c.msg=:pmsg AND c.user=:puser AND c.date=:pdate")
-	Comment deleteById(@Param("pmsg") String msg, @Param("puser") User user, @Param("pdate") Date date); 	
+	@Query(value="Update Comment Set deleted = true where c.msg=:pmsg AND c.userEmail=:puserEmail AND c.date=:pdate")
+	Comment deleteById(@Param("pmsg") String msg, @Param("puserEmail") String userEmail, @Param("pdate") Date date); 	
 }

@@ -6,17 +6,26 @@ import java.util.HashSet;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 import lombok.Data;
 
 @Data
 @Entity
 @IdClass(CommentId.class)
+@Table(name = "Comment")
 public class Comment {
 
-	@Id private String msg;
-	@Id private Date date;
-	@Id private User user;
+	@Id 
+	private String msg;
+	@Id 
+	private Date date;
+	@Id 
+	@ManyToOne
+	private String userEmail;
 	private Boolean deleted;
 	private HashSet<Comment> comments;
 	
@@ -24,10 +33,10 @@ public class Comment {
 		
 	}
 	
-	public Comment(String msg, Date date, User user) {
+	public Comment(String msg, Date date, String email) {
 		this.msg = msg;
 		this.date = date;
-		this.user = user;
+		this.userEmail = email;
 		this.deleted = false;
 		this.comments = new HashSet<Comment>();
 	}
@@ -44,8 +53,8 @@ public class Comment {
 		return date;
 	}
 
-	public User getUser() {
-		return user;
+	public String getUserEmail() {
+		return this.userEmail;
 	}
 
 	public Boolean getDeleted() {
@@ -70,7 +79,7 @@ public class Comment {
 		int result = 1;
 		result = prime * result + ((date == null) ? 0 : date.hashCode());
 		result = prime * result + ((msg == null) ? 0 : msg.hashCode());
-		result = prime * result + ((user == null) ? 0 : user.hashCode());
+		result = prime * result + ((userEmail == null) ? 0 : userEmail.hashCode());
 		return result;
 	}
 
@@ -93,13 +102,15 @@ public class Comment {
 				return false;
 		} else if (!msg.equals(other.msg))
 			return false;
-		if (user == null) {
-			if (other.user != null)
+		if (userEmail == null) {
+			if (other.userEmail != null)
 				return false;
-		} else if (!user.equals(other.user))
+		} else if (!userEmail.equals(other.userEmail))
 			return false;
 		return true;
 	}
+
+	
 	
 	
 	

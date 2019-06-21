@@ -1,21 +1,27 @@
 package com.psoft.UCDb.rest.model;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import lombok.Data;
 
 @Data
 @Entity
+@Table(name = "User")
 public class User {
 	@Id
 	private String email;// validar email
 	private String name;
 	private String lastName;
 	private String password;// força da senha? quem sabe
-	private HashSet<Comment> comments;
+	@OneToMany
+	private Set<Comment> comments;
 
 	public User() {
 
@@ -45,7 +51,7 @@ public class User {
 		return this.lastName;
 	}
 	
-	public HashSet<Comment> getComments() {
+	public Set<Comment> getComments() {
 		return this.comments;
 	}
 

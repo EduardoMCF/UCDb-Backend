@@ -46,7 +46,6 @@ public class LoginController {
         
         return new LoginResponse(token);
         
-        
     }
     
     private class LoginResponse {
