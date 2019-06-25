@@ -13,14 +13,13 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "User")
 public class User {
 	@Id
 	private String email;// validar email
 	private String name;
 	private String lastName;
 	private String password;// força da senha? quem sabe
-	@OneToMany
+	@OneToMany(mappedBy = "user")
 	private Set<Comment> comments;
 
 	public User() {

@@ -1,5 +1,7 @@
 package com.psoft.UCDb.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.psoft.UCDb.exceptions.SubjectNotFoundException;
@@ -10,7 +12,7 @@ import com.psoft.UCDb.rest.model.Subject;
 public class SubjectService {
 	private final SubjectDAO subjectDAO;
 	
-	SubjectService (SubjectDAO subjectDAO) {
+	public SubjectService (SubjectDAO subjectDAO) {
 		this.subjectDAO = subjectDAO;
 	}
 	
@@ -30,5 +32,9 @@ public class SubjectService {
 	
 	public Subject findById(int id) {
 		return this.subjectDAO.findById(id);
+	}
+	
+	public List<Subject> findByPattern(String pattern) {
+		return this.subjectDAO.findByNameContaining(pattern);
 	}
 }

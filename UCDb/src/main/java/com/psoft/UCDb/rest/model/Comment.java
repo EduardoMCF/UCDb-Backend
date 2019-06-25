@@ -4,8 +4,11 @@ import java.util.Date;
 import java.util.HashSet;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -15,17 +18,15 @@ import lombok.Data;
 
 @Data
 @Entity
-@IdClass(CommentId.class)
-@Table(name = "Comment")
 public class Comment {
 
-	@Id 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long commentId;
 	private String msg;
-	@Id 
 	private Date date;
-	@Id 
 	@ManyToOne
-	private String userEmail;
+	private User user;
 	private Boolean deleted;
 	private HashSet<Comment> comments;
 	
@@ -33,12 +34,23 @@ public class Comment {
 		
 	}
 	
-	public Comment(String msg, Date date, String email) {
+	public Comment(String msg, Date date) {
 		this.msg = msg;
 		this.date = date;
-		this.userEmail = email;
 		this.deleted = false;
 		this.comments = new HashSet<Comment>();
+	}
+	
+	public Comment(String msg, Date date, User user) {
+		this.msg = msg;
+		this.date = date;
+		this.user = user;
+		this.deleted = false;
+		this.comments = new HashSet<Comment>();
+	}
+	
+	public long getCommentId() {
+		return this.commentId;
 	}
 	
 	public String getMsg() {
@@ -53,8 +65,8 @@ public class Comment {
 		return date;
 	}
 
-	public String getUserEmail() {
-		return this.userEmail;
+	public User getUser() {
+		return this.user;
 	}
 
 	public Boolean getDeleted() {
@@ -79,7 +91,7 @@ public class Comment {
 		int result = 1;
 		result = prime * result + ((date == null) ? 0 : date.hashCode());
 		result = prime * result + ((msg == null) ? 0 : msg.hashCode());
-		result = prime * result + ((userEmail == null) ? 0 : userEmail.hashCode());
+		result = prime * result + ((user == null) ? 0 : user.hashCode());
 		return result;
 	}
 
@@ -102,10 +114,10 @@ public class Comment {
 				return false;
 		} else if (!msg.equals(other.msg))
 			return false;
-		if (userEmail == null) {
-			if (other.userEmail != null)
+		if (user == null) {
+			if (other.user != null)
 				return false;
-		} else if (!userEmail.equals(other.userEmail))
+		} else if (!user.equals(other.user))
 			return false;
 		return true;
 	}

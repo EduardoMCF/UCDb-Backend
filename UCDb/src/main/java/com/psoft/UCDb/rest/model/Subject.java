@@ -9,6 +9,7 @@ import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
@@ -23,15 +24,26 @@ public class Subject {
 	private int id;
 	private String name;
 	@ManyToMany
-	@JoinTable
+	@JoinTable(
+			name = "subject_usersThatLiked",
+			joinColumns = @JoinColumn(name = "id"),
+			inverseJoinColumns = @JoinColumn(name = "email")
+	)
 	private Set<User> usersThatLiked;
 	@ManyToMany
-	@JoinTable
+	@JoinTable(
+			name = "subject_usersThatDisliked",
+			joinColumns = @JoinColumn(name = "id"),
+			inverseJoinColumns = @JoinColumn(name = "email")
+	)
 	private Set<User> usersThatDisliked;
-	private int commentId;
+	private long cID;
 	@OneToMany
-	private Map<Integer,Comment> comments;
-	private List<Double> rates;
+	@JoinColumn(name = "commentId")
+	private Map<Long,Comment> comments;
+	@OneToMany
+	@JoinColumn(name = "rateId")
+	private List<Rate> rates;
 
 	public Subject() {
 
@@ -42,9 +54,9 @@ public class Subject {
 		this.id = id;
 		this.usersThatLiked = new HashSet<User>();
 		this.usersThatDisliked = new HashSet<User>();
-		this.commentId = 0;
-		this.comments = new HashMap<Integer,Comment>();
-		this.rates = new ArrayList<Double>();
+		this.cID = 0;
+		this.comments = new HashMap<Long,Comment>();
+		this.rates = new ArrayList<Rate>();
 		
 	}
 	
@@ -76,17 +88,21 @@ public class Subject {
 		return this.comments.size();
 	}
 	
-	public Map<Integer,Comment> getComments() {
+	public Map<Long,Comment> getComments() {
 		return this.comments;
 	}
 
 	public Double getRate() {
 		Double sum = 0.0;
-		for (Double rate : rates) {
-			sum += rate;
+		for (Rate rate : rates) {
+			sum += rate.getRate();
 		}
 		
-		return sum / this.rates.size();
+		return sum / this.getNumRates();
+	}
+	
+	public int getNumRates() {
+		return this.rates.size();
 	}
 	
 	public void setLike(User user) {
@@ -119,9 +135,14 @@ public class Subject {
 
 	public void addComment(Comment comment) {
 		if (!this.comments.containsValue(comment)) {
-			this.comments.put(this.commentId, comment);
-			this.commentId += 1;
+			this.comments.put(this.cID, comment);
+			this.cID += 1;
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return this.id + " - " + this.name; 
 	}
 
 	@Override

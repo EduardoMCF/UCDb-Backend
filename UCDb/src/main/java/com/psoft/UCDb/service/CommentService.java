@@ -22,9 +22,7 @@ public class CommentService {
 	}
 	
 	public Comment update(Comment commentToUpdate) throws CommentNotFoundException {
-		Comment comment = this.commentDAO.findById(commentToUpdate.getMsg(), 
-												   commentToUpdate.getUserEmail(),
-												   commentToUpdate.getDate());
+		Comment comment = this.commentDAO.findById(commentToUpdate.getCommentId());
 		
 		if(comment == null) {
 			throw new CommentNotFoundException("Couldn't update. Comment doesn't exist");
@@ -33,7 +31,7 @@ public class CommentService {
 		return this.commentDAO.save(commentToUpdate);
 	}
 	
-	public Comment findById(String msg, String userEmail, Date date) {
-		return this.commentDAO.findById(msg, userEmail, date);
+	public Comment findById(long id) {
+		return this.commentDAO.findById(id);
 	}
 }
