@@ -34,7 +34,7 @@ public class DataLoader implements ApplicationRunner {
     	HashMap<String,String> subjects = this.loadData();
     	
     	for (Entry<String, String> item : subjects.entrySet()) {
-        	int id = Integer.parseInt(item.getKey());
+        	int id = Integer.parseInt(item.getKey()) + 1;
         	String name = item.getValue();
         	this.insertSubject(id,name);
 		}
@@ -42,7 +42,7 @@ public class DataLoader implements ApplicationRunner {
     
     private HashMap<String, String> loadData() throws FileNotFoundException {
     	Gson gson = new Gson();
-        String path = new File("src\\main\\resources\\subject.json").getAbsolutePath();
+        String path = new File("src/main/resources/subject.json").getAbsolutePath();
         BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
         HashMap<String, String> subjects = gson.fromJson(bufferedReader, HashMap.class);
         return subjects;

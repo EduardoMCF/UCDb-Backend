@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,7 +35,9 @@ import io.jsonwebtoken.Jwts;
 @RequestMapping({ "/v1/subject" })
 public class SubjectController {
 	private SubjectService subjectService;
+	@Autowired
 	private UserService userService;
+	@Autowired
 	private CommentService commentService;
 	
 	public SubjectController(SubjectService subjectService) {
@@ -127,12 +130,17 @@ public class SubjectController {
 	
 	@PostMapping(value = "/{id}/comment/")
 	@ResponseBody
-	public ResponseEntity<Comment> search(@RequestHeader("Authorization") String auth, @PathVariable int id, @RequestBody Comment comment) {
+	public ResponseEntity<Comment> addComment(@RequestHeader("Authorization") String auth, @PathVariable int id, @RequestBody Comment comment) {
 		String email = this.getEmailFromJWT(auth);
 		System.out.println(email);
 		User user = this.userService.findByEmail(email);
-		Comment newComment = new Comment(comment.getMsg(), comment.getDate(),user);
+		Subject subject = this.subjectService.findById(id);
+		Comment newComment = new Comment(comment.getMsg(), comment.getDate(), user);
 		this.commentService.create(newComment);
+		user.addComment(newComment);
+		this.userService.update(user);
+		subject.addComment(newComment);
+		this.subjectService.update(subject);
 		return new ResponseEntity<Comment>(comment, HttpStatus.CREATED);
 	}
 	

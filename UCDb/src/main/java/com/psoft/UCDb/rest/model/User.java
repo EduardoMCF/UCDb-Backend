@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
 
 import lombok.Data;
 
@@ -52,6 +53,10 @@ public class User {
 	
 	public Set<Comment> getComments() {
 		return this.comments;
+	}
+	
+	public void addComment(Comment comment) {
+		this.comments.add(comment);
 	}
 
 	@Override

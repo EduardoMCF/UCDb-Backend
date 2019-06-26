@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -23,12 +24,13 @@ public class Comment {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long commentId;
+	private long parentID;
 	private String msg;
 	private Date date;
 	@ManyToOne
 	private User user;
 	private Boolean deleted;
-	private HashSet<Comment> comments;
+	
 	
 	public Comment() {
 		

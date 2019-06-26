@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -38,8 +40,11 @@ public class Subject {
 	)
 	private Set<User> usersThatDisliked;
 	private long cID;
-	@OneToMany
-	@JoinColumn(name = "commentId")
+	@ElementCollection
+	@CollectionTable(
+	        name="SUBJECT_COMMENTS",
+	        joinColumns=@JoinColumn(name="commentID")
+	)
 	private Map<Long,Comment> comments;
 	@OneToMany
 	@JoinColumn(name = "rateId")
@@ -54,7 +59,7 @@ public class Subject {
 		this.id = id;
 		this.usersThatLiked = new HashSet<User>();
 		this.usersThatDisliked = new HashSet<User>();
-		this.cID = 0;
+		this.cID = 1;
 		this.comments = new HashMap<Long,Comment>();
 		this.rates = new ArrayList<Rate>();
 		
