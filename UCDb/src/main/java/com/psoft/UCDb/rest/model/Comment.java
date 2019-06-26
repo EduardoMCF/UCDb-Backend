@@ -25,6 +25,14 @@ public class Comment {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long commentId;
 	private long parentID;
+	
+	@One
+	@join (disciplina_id)
+	List coment
+	
+	private Subject subject;
+	private long userID;
+	@ManyToOne
 	private String msg;
 	private Date date;
 	@ManyToOne

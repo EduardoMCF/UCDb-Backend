@@ -40,12 +40,9 @@ public class Subject {
 	)
 	private Set<User> usersThatDisliked;
 	private long cID;
-	@ElementCollection
-	@CollectionTable(
-	        name="SUBJECT_COMMENTS",
-	        joinColumns=@JoinColumn(name="commentID")
-	)
-	private Map<Long,Comment> comments;
+	@OneToMany(mappedBy = "subject")
+	@JoinColumn()
+	private HashSet<Comment> comments;
 	@OneToMany
 	@JoinColumn(name = "rateId")
 	private List<Rate> rates;
