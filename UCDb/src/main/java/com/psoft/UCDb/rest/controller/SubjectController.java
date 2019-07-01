@@ -1,6 +1,7 @@
 package com.psoft.UCDb.rest.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -82,6 +83,15 @@ public class SubjectController {
 		return newCommentList;
 	}
 	
+	private List<SubjectResponseDTO> convertSubjectList(List<Subject> subjects){
+		SubjectResponseDTO response = new SubjectResponseDTO();
+		List<SubjectResponseDTO> newSubjectList = new ArrayList<SubjectResponseDTO>();
+		
+		for (Subject subject : subjects) {
+			newSubjectList.add(response.toSubjectResponse(subject, comments, userComments, liked, disliked))
+		}
+	}
+	
 	private Boolean verifyLike(Set<User> users, String email) {
 		Boolean liked = false;
 		for (User user : users) {
@@ -155,6 +165,39 @@ public class SubjectController {
 		
 		CommentResponseDTO commentResponse = new CommentResponseDTO();
 		return new ResponseEntity<CommentResponseDTO>(commentResponse.toCommentResponse(comment), HttpStatus.CREATED);
+	}
+	
+	@GetMapping(value = "/{id}/like")
+	@ResponseBody
+	public ResponseEntity<SubjectResponseDTO> like(@RequestHeader("Authorization") String auth, @PathVariable int id){
+		Subject subject = this.subjectService.findById(id);
+		String email = this.getEmailFromJWT(auth);
+		User user  = this.userService.findByEmail(email);
+		subject.setLike(user);
+		this.subjectService.update(subject);
+		SubjectResponseDTO response = this.getSubjectResponse(subject, email);
+		return new ResponseEntity<SubjectResponseDTO>(response,HttpStatus.ACCEPTED);
+	}
+	
+	@GetMapping(value = "/{id}/dislike")
+	@ResponseBody
+	public ResponseEntity<SubjectResponseDTO> dislike(@RequestHeader("Authorization") String auth, @PathVariable int id){
+		Subject subject = this.subjectService.findById(id);
+		String email = this.getEmailFromJWT(auth);
+		User user  = this.userService.findByEmail(email);
+		subject.setDislike(user);
+		this.subjectService.update(subject);
+		SubjectResponseDTO response = this.getSubjectResponse(subject, email);
+		return new ResponseEntity<SubjectResponseDTO>(response,HttpStatus.ACCEPTED);
+	}
+	
+	@GetMapping(value = "/sort")
+	@ResponseBody
+	public ResponseEntity<List<SubjectResponseDTO>> sortByLike(@RequestHeader("Authorization") String auth){
+		List<Subject> subjects = this.subjectService.getAllSubjects();
+		Collections.sort(subjects);
+		return new ResponseEntity<List<SubjectResponseDTO>>(this.convertCommentList(comments),HttpStatus.ACCEPTED);
+		
 	}
 	
 	private String getEmailFromJWT(String auth) { 

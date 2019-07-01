@@ -23,7 +23,7 @@ import lombok.Data;
 
 @Data
 @Entity
-public class Subject {
+public class Subject implements Comparable<Subject>{
 	@Id
 	private int id;
 	private String name;
@@ -139,6 +139,8 @@ public class Subject {
 		this.comments.add(comment);
 	}
 	
+	
+	
 	@Override
 	public String toString() {
 		return this.id + " - " + this.name; 
@@ -164,6 +166,11 @@ public class Subject {
 		if (id != other.id)
 			return false;
 		return true;
+	}
+
+	@Override
+	public int compareTo(Subject o) {
+		return this.getNumberOfLikes() - o.getNumberOfLikes();
 	}
 	
 	

@@ -15,6 +15,8 @@ public interface SubjectDAO extends JpaRepository<Subject, Integer> {
 	Subject save(Subject subject);
 	Subject findById(int id);
 	Subject deleteById(int id);
+	@Query("SELECT s FROM Subject s")
+	List<Subject> getAllSubjects();
 	//@Query("SELECT s.name FROM Subject s WHERE s.name LIKE CONCAT('%',:pattern,'%')")
 	List<Subject> findByNameContaining(String name);
 }

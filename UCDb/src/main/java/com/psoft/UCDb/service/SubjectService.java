@@ -34,6 +34,10 @@ public class SubjectService {
 		return this.subjectDAO.findById(id);
 	}
 	
+	public List<Subject> getAllSubjects(){
+		return this.subjectDAO.getAllSubjects();
+	}
+	
 	public List<Subject> findByPattern(String pattern) {
 		return this.subjectDAO.findByNameContaining(pattern);
 	}
