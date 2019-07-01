@@ -1,7 +1,7 @@
 package com.psoft.UCDb.rest.model;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -9,6 +9,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.Data;
 
@@ -21,7 +23,8 @@ public class User {
 	private String lastName;
 	private String password;// força da senha? quem sabe
 	@OneToMany(mappedBy = "user")
-	private Set<Comment> comments;
+	//@JsonBackReference 
+	private List<Comment> comments;
 
 	public User() {
 
@@ -32,7 +35,7 @@ public class User {
 		this.lastName = lastName;
 		this.email = email;
 		this.password = password;
-		this.comments = new HashSet<Comment>();
+		this.comments = new ArrayList<Comment>();
 	}
 
 	public String getEmail() {
@@ -51,7 +54,7 @@ public class User {
 		return this.lastName;
 	}
 	
-	public Set<Comment> getComments() {
+	public List<Comment> getComments() {
 		return this.comments;
 	}
 	

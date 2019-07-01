@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashSet;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -15,6 +16,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import lombok.Data;
 
 @Data
@@ -25,17 +28,12 @@ public class Comment {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long commentId;
 	private long parentID;
-	
-	@One
-	@join (disciplina_id)
-	List coment
-	
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Subject subject;
-	private long userID;
-	@ManyToOne
 	private String msg;
 	private Date date;
-	@ManyToOne
+	//@JsonManagedReference 
+	@ManyToOne(fetch = FetchType.LAZY)
 	private User user;
 	private Boolean deleted;
 	
@@ -48,15 +46,22 @@ public class Comment {
 		this.msg = msg;
 		this.date = date;
 		this.deleted = false;
-		this.comments = new HashSet<Comment>();
 	}
 	
-	public Comment(String msg, Date date, User user) {
+	public Comment(String msg, Date date, User user, long parentId, long parentID) {
 		this.msg = msg;
 		this.date = date;
 		this.user = user;
 		this.deleted = false;
-		this.comments = new HashSet<Comment>();
+		this.parentID = parentID;
+	}
+	
+	public Comment(String msg, Date date, User user, Subject subject) {
+		this.msg = msg;
+		this.date = date;
+		this.user = user;
+		this.deleted = false;
+		this.subject = subject;
 	}
 	
 	public long getCommentId() {
@@ -75,10 +80,6 @@ public class Comment {
 		return date;
 	}
 
-	public User getUser() {
-		return this.user;
-	}
-
 	public Boolean getDeleted() {
 		return deleted;
 	}
@@ -87,21 +88,35 @@ public class Comment {
 		this.deleted = deleted;
 	}
 
-	public HashSet<Comment> getComments() {
-		return comments;
+	public long getParentID() {
+		return parentID;
 	}
 
-	public void addComment(Comment comment) {
-		this.comments.add(comment);
+	public void setParentID(long parentID) {
+		this.parentID = parentID;
+	}
+
+	public Subject getSubject() {
+		return subject;
+	}
+
+	public void setSubject(Subject subject) {
+		this.subject = subject;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((date == null) ? 0 : date.hashCode());
-		result = prime * result + ((msg == null) ? 0 : msg.hashCode());
-		result = prime * result + ((user == null) ? 0 : user.hashCode());
+		result = prime * result + (int) (commentId ^ (commentId >>> 32));
 		return result;
 	}
 
@@ -114,26 +129,9 @@ public class Comment {
 		if (getClass() != obj.getClass())
 			return false;
 		Comment other = (Comment) obj;
-		if (date == null) {
-			if (other.date != null)
-				return false;
-		} else if (!date.equals(other.date))
-			return false;
-		if (msg == null) {
-			if (other.msg != null)
-				return false;
-		} else if (!msg.equals(other.msg))
-			return false;
-		if (user == null) {
-			if (other.user != null)
-				return false;
-		} else if (!user.equals(other.user))
+		if (commentId != other.commentId)
 			return false;
 		return true;
 	}
-
-	
-	
-	
 	
 }

@@ -17,6 +17,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.Data;
 
 @Data
@@ -39,10 +41,9 @@ public class Subject {
 			inverseJoinColumns = @JoinColumn(name = "email")
 	)
 	private Set<User> usersThatDisliked;
-	private long cID;
 	@OneToMany(mappedBy = "subject")
-	@JoinColumn()
-	private HashSet<Comment> comments;
+	//@JsonBackReference
+	private List<Comment> comments;
 	@OneToMany
 	@JoinColumn(name = "rateId")
 	private List<Rate> rates;
@@ -56,8 +57,7 @@ public class Subject {
 		this.id = id;
 		this.usersThatLiked = new HashSet<User>();
 		this.usersThatDisliked = new HashSet<User>();
-		this.cID = 1;
-		this.comments = new HashMap<Long,Comment>();
+		this.comments = new ArrayList<Comment>();
 		this.rates = new ArrayList<Rate>();
 		
 	}
@@ -88,10 +88,6 @@ public class Subject {
 
 	public int getNumberOfComments() {
 		return this.comments.size();
-	}
-	
-	public Map<Long,Comment> getComments() {
-		return this.comments;
 	}
 
 	public Double getRate() {
@@ -134,12 +130,13 @@ public class Subject {
 			this.usersThatDisliked.add(user);
 		}
 	}
+	
+	public List<Comment> getComments() {
+		return this.comments;
+	}
 
 	public void addComment(Comment comment) {
-		if (!this.comments.containsValue(comment)) {
-			this.comments.put(this.cID, comment);
-			this.cID += 1;
-		}
+		this.comments.add(comment);
 	}
 	
 	@Override

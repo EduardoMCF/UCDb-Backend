@@ -18,12 +18,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.psoft.UCDb.exceptions.SubjectNotFoundException;
+import com.psoft.UCDb.rest.DTO.CommentDTO;
+import com.psoft.UCDb.rest.DTO.CommentResponseDTO;
+import com.psoft.UCDb.rest.DTO.SearchSubjectResponseDTO;
+import com.psoft.UCDb.rest.DTO.SubjectResponseDTO;
 import com.psoft.UCDb.rest.dao.UserDAO;
 import com.psoft.UCDb.rest.model.Comment;
 import com.psoft.UCDb.rest.model.Subject;
 import com.psoft.UCDb.rest.model.User;
-import com.psoft.UCDb.rest.responses.SearchSubjectResponse;
-import com.psoft.UCDb.rest.responses.SubjectResponse;
 import com.psoft.UCDb.service.CommentService;
 import com.psoft.UCDb.service.SubjectService;
 import com.psoft.UCDb.service.UserService;
@@ -46,7 +48,7 @@ public class SubjectController {
 	
 	@GetMapping(value = "/{id}")
 	@ResponseBody
-	public ResponseEntity<SubjectResponse> findById(@RequestHeader("Authorization") String auth, @PathVariable int id) {
+	public ResponseEntity<SubjectResponseDTO> findById(@RequestHeader("Authorization") String auth, @PathVariable int id) {
 		Subject subject = this.subjectService.findById(id);
 		
 		if (subject == null) {
@@ -54,25 +56,30 @@ public class SubjectController {
 		}
 		
 		String email = this.getEmailFromJWT(auth);
-		SubjectResponse response = this.getSubjectResponse(subject, email);
+		SubjectResponseDTO response = this.getSubjectResponse(subject, email);
 		
-		return new ResponseEntity<SubjectResponse>(response, HttpStatus.OK);
+		return new ResponseEntity<SubjectResponseDTO>(response, HttpStatus.OK);
 	}
 	
-	private SubjectResponse getSubjectResponse(Subject subject, String email) {
-		String name = subject.getName();
-		int numLikes = subject.getNumberOfLikes();
-		int numDislikes = subject.getNumberOfDislikes();
-		Double rate = subject.getRate();
-		int numUsersThatRated = subject.getNumRates();
-		Set<Comment> comments = (Set<Comment>) subject.getComments().values();
+	private SubjectResponseDTO getSubjectResponse(Subject subject, String email) {
+		List<CommentResponseDTO> comments = this.convertCommentList(subject.getComments());
 		Boolean liked = this.verifyLike(subject.getUsersThatLiked(), email);
 		Boolean disliked = this.verifyLike(subject.getUsersThatDisliked(), email);
-		Set<Comment> userComments = this.getCommentsOfUser(comments, email);
+		List<CommentResponseDTO> userComments = this.convertCommentList(this.getCommentsOfUser(subject.getComments(), email));
 		
-		SubjectResponse response = new SubjectResponse(name, numLikes, numDislikes, rate, numUsersThatRated,
-				comments, liked, disliked, userComments);
-		return response;
+		SubjectResponseDTO response = new SubjectResponseDTO();
+		return response.toSubjectResponse(subject, comments, userComments, liked, disliked);
+	}
+	
+	private List<CommentResponseDTO> convertCommentList(List<Comment> comments){
+		CommentResponseDTO commentResponse = new CommentResponseDTO();
+		List<CommentResponseDTO> newCommentList = new ArrayList<CommentResponseDTO>();
+		
+		for (Comment comment : comments) {
+			newCommentList.add(commentResponse.toCommentResponse(comment));
+		}
+		
+		return newCommentList;
 	}
 	
 	private Boolean verifyLike(Set<User> users, String email) {
@@ -87,8 +94,8 @@ public class SubjectController {
 		return liked;
 	}
 	
-	private Set<Comment> getCommentsOfUser(Set<Comment> comments, String email) {
-		Set<Comment> result = new HashSet<Comment>();
+	private List<Comment> getCommentsOfUser(List<Comment> comments, String email) {
+		List<Comment> result = new ArrayList<Comment>();
 		for (Comment comment : comments) {
 			if (comment.getUser().getEmail().equals(email))
 				result.add(comment);
@@ -116,7 +123,7 @@ public class SubjectController {
 	
 	@GetMapping(value = "/search/{pattern}")
 	@ResponseBody
-	public ResponseEntity<SearchSubjectResponse> search(@PathVariable String pattern) {
+	public ResponseEntity<SearchSubjectResponseDTO> search(@PathVariable String pattern) {
 		List<Subject> result = this.subjectService.findByPattern(pattern.toUpperCase());
 		
 		List<String> list = new ArrayList<String>();
@@ -124,24 +131,30 @@ public class SubjectController {
 			list.add(subject.toString());
 		}
 		
-		SearchSubjectResponse searchResponse = new SearchSubjectResponse(list);
-		return new ResponseEntity<SearchSubjectResponse>(searchResponse, HttpStatus.OK);
+		SearchSubjectResponseDTO searchResponse = new SearchSubjectResponseDTO(list);
+		return new ResponseEntity<SearchSubjectResponseDTO>(searchResponse, HttpStatus.OK);
 	}
 	
 	@PostMapping(value = "/{id}/comment/")
 	@ResponseBody
-	public ResponseEntity<Comment> addComment(@RequestHeader("Authorization") String auth, @PathVariable int id, @RequestBody Comment comment) {
+	public ResponseEntity<CommentResponseDTO> addComment(@RequestHeader("Authorization") String auth, @PathVariable int id, @RequestBody CommentDTO commentDTO) {
+		Comment comment = commentDTO.toComment();
+		
 		String email = this.getEmailFromJWT(auth);
-		System.out.println(email);
 		User user = this.userService.findByEmail(email);
 		Subject subject = this.subjectService.findById(id);
-		Comment newComment = new Comment(comment.getMsg(), comment.getDate(), user);
-		this.commentService.create(newComment);
-		user.addComment(newComment);
+
+		comment.setUser(user);
+		comment.setSubject(subject);
+		
+		this.commentService.create(comment);
+		user.addComment(comment);
 		this.userService.update(user);
-		subject.addComment(newComment);
+		subject.addComment(comment);
 		this.subjectService.update(subject);
-		return new ResponseEntity<Comment>(comment, HttpStatus.CREATED);
+		
+		CommentResponseDTO commentResponse = new CommentResponseDTO();
+		return new ResponseEntity<CommentResponseDTO>(commentResponse.toCommentResponse(comment), HttpStatus.CREATED);
 	}
 	
 	private String getEmailFromJWT(String auth) { 
