@@ -1,5 +1,6 @@
 package com.psoft.UCDb.rest.model;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 
@@ -32,7 +33,6 @@ public class Comment {
 	private Subject subject;
 	private String msg;
 	private Date date;
-	//@JsonManagedReference 
 	@ManyToOne(fetch = FetchType.LAZY)
 	private User user;
 	private Boolean deleted;
@@ -42,15 +42,15 @@ public class Comment {
 		
 	}
 	
-	public Comment(String msg, Date date) {
+	public Comment(String msg) {
 		this.msg = msg;
-		this.date = date;
+		this.date = Calendar.getInstance().getTime();
 		this.deleted = false;
 	}
 	
 	public Comment(String msg, Date date, User user, long parentId, long parentID) {
 		this.msg = msg;
-		this.date = date;
+		this.date = Calendar.getInstance().getTime();
 		this.user = user;
 		this.deleted = false;
 		this.parentID = parentID;
@@ -58,7 +58,7 @@ public class Comment {
 	
 	public Comment(String msg, Date date, User user, Subject subject) {
 		this.msg = msg;
-		this.date = date;
+		this.date = Calendar.getInstance().getTime();
 		this.user = user;
 		this.deleted = false;
 		this.subject = subject;

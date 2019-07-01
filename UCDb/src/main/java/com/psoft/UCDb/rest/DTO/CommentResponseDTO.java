@@ -12,11 +12,13 @@ public class CommentResponseDTO {
 	private String msg;
 	private Date date;
 	private String email;
+	private boolean deleted;
 	
-	public CommentResponseDTO(String msg, Date date, String email) {
+	public CommentResponseDTO(String msg, Date date, String email, boolean deleted) {
 		this.msg = msg;
 		this.date = date;
 		this.email = email;
+		this.deleted = deleted;
 	}
 	
 	public CommentResponseDTO() {
@@ -24,11 +26,14 @@ public class CommentResponseDTO {
 	}
 
 	public CommentResponseDTO toCommentResponse(Comment comment) {
-		return new CommentResponseDTO(comment.getMsg(),comment.getDate(),comment.getUser().getEmail());
+		return new CommentResponseDTO(comment.getMsg(),comment.getDate(),comment.getUser().getEmail(),comment.getDeleted());
 	}
 
 	public String getMsg() {
-		return msg;
+		String result = "";
+		if (!this.deleted)
+			result = this.msg;
+		return result;
 	}
 
 	public Date getDate() {
@@ -37,5 +42,9 @@ public class CommentResponseDTO {
 
 	public String getEmail() {
 		return email;
+	}
+	
+	public Boolean getDeleted() {
+		return this.deleted;
 	}
 }

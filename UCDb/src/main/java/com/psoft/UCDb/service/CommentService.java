@@ -1,6 +1,7 @@
 package com.psoft.UCDb.service;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -33,5 +34,15 @@ public class CommentService {
 	
 	public Comment findById(long id) {
 		return this.commentDAO.findById(id);
+	}
+	
+	public void delete(int id) {
+		Comment comment = this.findById(id);
+		comment.setDeleted(true);
+		this.commentDAO.save(comment);
+	}
+	
+	public List<Comment> findByParentId(long id){
+		return this.commentDAO.findByParentId(id);
 	}
 }

@@ -1,6 +1,7 @@
 package com.psoft.UCDb.rest.dao;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,8 +21,6 @@ public interface CommentDAO extends JpaRepository<Comment, Long>{
 	@Query(value="Select c from Comment c where c.commentId=:pid")
 	Comment findById(@Param("pid") long commentId);
 	
-	@Query(value="Update Comment Set deleted = true where commentId=:pid")
-	Comment deleteById(@Param("pid") long commentId);
-	//@Query(value="Update Comment Set deleted = true where c.msg=:pmsg AND c.userEmail=:puserEmail AND c.date=:pdate")
-	//Comment deleteById(@Param("pmsg") String msg, @Param("puserEmail") String userEmail, @Param("pdate") Date date); 	
+	@Query(value="Select c from Comment c where c.parentID=:parentid")
+	List<Comment> findByParentId(@Param("parentid") long parentID);
 }
