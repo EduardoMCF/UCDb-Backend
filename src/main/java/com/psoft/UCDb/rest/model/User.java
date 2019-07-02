@@ -16,6 +16,7 @@ import lombok.Data;
 
 @Data
 @Entity
+@Table(name="Tb_user")
 public class User {
 	@Id
 	private String email;// validar email

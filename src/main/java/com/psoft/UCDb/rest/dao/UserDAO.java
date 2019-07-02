@@ -13,8 +13,8 @@ import com.psoft.UCDb.rest.model.User;
 public interface UserDAO extends JpaRepository<User, String> {
 	
    User save(User usuario);
-   @Query(value="Select u from User u where u.email=:plogin")
-   User findByEmail(@Param("plogin") String email);
+   //@Query(value="Select u from Tb_User u where u.email=:plogin")
+   User findByEmail(String email);
    
    User deleteByEmail(String email);
 }
