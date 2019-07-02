@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.psoft.UCDb.exceptions.SubjectNotFoundException;
 import com.psoft.UCDb.rest.DTO.CommentDTO;
 import com.psoft.UCDb.rest.DTO.CommentResponseDTO;
+import com.psoft.UCDb.rest.DTO.RankingCommentsResponseDTO;
+import com.psoft.UCDb.rest.DTO.RankingLikesResponseDTO;
 import com.psoft.UCDb.rest.DTO.SearchSubjectResponseDTO;
 import com.psoft.UCDb.rest.DTO.SubjectResponseDTO;
 import com.psoft.UCDb.rest.dao.UserDAO;
@@ -30,6 +32,9 @@ import com.psoft.UCDb.rest.model.User;
 import com.psoft.UCDb.service.CommentService;
 import com.psoft.UCDb.service.SubjectService;
 import com.psoft.UCDb.service.UserService;
+import com.psoft.UCDb.util.Util;
+import com.psoft.UCDb.util.comparators.CommentsComparator;
+import com.psoft.UCDb.util.comparators.LikesComparator;
 
 import io.jsonwebtoken.Jwts;
 
@@ -57,7 +62,7 @@ public class SubjectController {
 		}
 		
 		String email = this.getEmailFromJWT(auth);
-		SubjectResponseDTO response = this.getSubjectResponse(subject, email);
+		SubjectResponseDTO response = Util.getSubjectResponse(subject, email);
 		
 		return new ResponseEntity<SubjectResponseDTO>(response, HttpStatus.OK);
 	}
@@ -81,15 +86,6 @@ public class SubjectController {
 		}
 		
 		return newCommentList;
-	}
-	
-	private List<SubjectResponseDTO> convertSubjectList(List<Subject> subjects){
-		SubjectResponseDTO response = new SubjectResponseDTO();
-		List<SubjectResponseDTO> newSubjectList = new ArrayList<SubjectResponseDTO>();
-		
-		for (Subject subject : subjects) {
-			newSubjectList.add(response.toSubjectResponse(subject, comments, userComments, liked, disliked))
-		}
 	}
 	
 	private Boolean verifyLike(Set<User> users, String email) {
@@ -117,10 +113,6 @@ public class SubjectController {
 	@PostMapping(value = "/")
 	@ResponseBody
 	public ResponseEntity<Subject> create(@RequestBody Subject subject) {
-		if (this.subjectService.findById(subject.getId()) != null) {
-			throw new InternalError("User already signed up");
-		}
-		
 		Subject newSubject = this.subjectService.create(subject);
 
 		if (newSubject == null) {
@@ -150,7 +142,7 @@ public class SubjectController {
 	public ResponseEntity<CommentResponseDTO> addComment(@RequestHeader("Authorization") String auth, @PathVariable int id, @RequestBody CommentDTO commentDTO) {
 		Comment comment = commentDTO.toComment();
 		
-		String email = this.getEmailFromJWT(auth);
+		String email = Util.getEmailFromJWT(auth);
 		User user = this.userService.findByEmail(email);
 		Subject subject = this.subjectService.findById(id);
 
@@ -171,7 +163,7 @@ public class SubjectController {
 	@ResponseBody
 	public ResponseEntity<SubjectResponseDTO> like(@RequestHeader("Authorization") String auth, @PathVariable int id){
 		Subject subject = this.subjectService.findById(id);
-		String email = this.getEmailFromJWT(auth);
+		String email = Util.getEmailFromJWT(auth);
 		User user  = this.userService.findByEmail(email);
 		subject.setLike(user);
 		this.subjectService.update(subject);
@@ -183,7 +175,7 @@ public class SubjectController {
 	@ResponseBody
 	public ResponseEntity<SubjectResponseDTO> dislike(@RequestHeader("Authorization") String auth, @PathVariable int id){
 		Subject subject = this.subjectService.findById(id);
-		String email = this.getEmailFromJWT(auth);
+		String email = Util.getEmailFromJWT(auth);
 		User user  = this.userService.findByEmail(email);
 		subject.setDislike(user);
 		this.subjectService.update(subject);
@@ -191,13 +183,23 @@ public class SubjectController {
 		return new ResponseEntity<SubjectResponseDTO>(response,HttpStatus.ACCEPTED);
 	}
 	
-	@GetMapping(value = "/sort")
+	@GetMapping(value = "/ranking/likes")
 	@ResponseBody
-	public ResponseEntity<List<SubjectResponseDTO>> sortByLike(@RequestHeader("Authorization") String auth){
+	public ResponseEntity<List<RankingLikesResponseDTO>> sortByLike(){
 		List<Subject> subjects = this.subjectService.getAllSubjects();
-		Collections.sort(subjects);
-		return new ResponseEntity<List<SubjectResponseDTO>>(this.convertCommentList(comments),HttpStatus.ACCEPTED);
+		Collections.sort(subjects, new LikesComparator());
 		
+		return new ResponseEntity<List<RankingLikesResponseDTO>>(Util.convertRankingLike(subjects),HttpStatus.ACCEPTED);
+		
+	}
+	
+	@GetMapping(value = "/ranking/comments")
+	@ResponseBody
+	public ResponseEntity<List<RankingCommentsResponseDTO>> sortByComment(){
+		List<Subject> subjects = this.subjectService.getAllSubjects();
+		Collections.sort(subjects, new CommentsComparator());
+		
+		return new ResponseEntity<List<RankingCommentsResponseDTO>>(Util.convertRankingComment(subjects),HttpStatus.ACCEPTED);
 	}
 	
 	private String getEmailFromJWT(String auth) { 
