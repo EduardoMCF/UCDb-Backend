@@ -13,8 +13,8 @@ public class SubjectResponseDTO {
 	private String name;
 	private int numLikes;
 	private int numDislikes;
-	private Double rate;
-	private int numUsersThatRated;
+	private Double rate; ///// NAO PRECISA
+	private int numUsersThatRated; //// NAO PRECISA
 	private List<CommentResponseDTO> comments;
 	private Boolean liked;
 	private Boolean disliked;
