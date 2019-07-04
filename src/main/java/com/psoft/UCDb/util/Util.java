@@ -20,28 +20,6 @@ public class Util {
 		return Jwts.parser().setSigningKey("banana").parseClaimsJws(auth.substring(7)).getBody().get("sub", String.class);
 	}
 	
-	public static List<RankingLikesResponseDTO> convertRankingLike(List<Subject> subjects){
-		RankingLikesResponseDTO response = new RankingLikesResponseDTO();
-		List<RankingLikesResponseDTO> newList = new ArrayList<RankingLikesResponseDTO>();
-		
-		for (Subject subject : subjects) {
-			newList.add(response.toRanking(subject));
-		}
-		
-		return newList;
-	}
-	
-	public static List<RankingCommentsResponseDTO> convertRankingComment(List<Subject> subjects){
-		RankingCommentsResponseDTO response = new RankingCommentsResponseDTO();
-		List<RankingCommentsResponseDTO> newList = new ArrayList<RankingCommentsResponseDTO>();
-		
-		for (Subject subject : subjects) {
-			newList.add(response.toRanking(subject));
-		}
-		
-		return newList;
-	}
-	
 	public static List<CommentResponseDTO> convertCommentList(List<Comment> comments){
 		CommentResponseDTO commentResponse = new CommentResponseDTO();
 		List<CommentResponseDTO> newCommentList = new ArrayList<CommentResponseDTO>();

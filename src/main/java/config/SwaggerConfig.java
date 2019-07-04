@@ -5,7 +5,11 @@ import org.springframework.context.annotation.Configuration;
 
 import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+
+import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.*;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -28,11 +32,37 @@ import java.util.List;
 public class SwaggerConfig {
 
     public static final String DEFAULT_INCLUDE_PATTERN = "/.*";
-
+ 
+    
     @Bean
+    public Docket api() { 
+        return new Docket(DocumentationType.SWAGGER_2)  
+          .select()                                  
+          .apis(RequestHandlerSelectors.any())              
+          .paths(PathSelectors.any())                          
+          .build();                                           
+    }
+
+    private ApiInfo metaInfo() {
+
+        ApiInfo apiInfo = new ApiInfo(
+                "UCDb API REST",
+                "API REST de sistema de Usuários e Disciplinas.",
+                "1.0",
+                "Terms of Service",
+                new Contact("Eduardo Macedo e Gaspar Alencar", "",
+                        ""),
+                "Apache License Version 2.0",
+                "https://www.apache.org/licesen.html", new ArrayList<VendorExtension>()
+        );
+
+        return apiInfo;
+    }
+
+    /*@Bean
     public Docket swaggerSpringfoxDocket() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .pathMapping("/")
+                .pathMapping("/api")
                 .forCodeGeneration(true)
                 .genericModelSubstitutes(ResponseEntity.class)
                 .securityContexts(Lists.newArrayList(securityContext()))
@@ -62,5 +92,5 @@ public class SwaggerConfig {
         authorizationScopes[0] = authorizationScope;
         return Lists.newArrayList(
                 new SecurityReference("JWT", authorizationScopes));
-    }
+    }*/
 }

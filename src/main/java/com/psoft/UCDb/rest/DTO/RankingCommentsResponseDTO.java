@@ -1,27 +1,31 @@
 package com.psoft.UCDb.rest.DTO;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.psoft.UCDb.rest.model.Subject;
 
 public class RankingCommentsResponseDTO {
-	private int id;
-	private String name;
-	private int numComments;
+	private List<Subject> ranking;
 	
-	public RankingCommentsResponseDTO(int id, String name, int numComments) {
-		this.id = id;
-		this.name = name;
-		this.numComments = numComments;
+	public RankingCommentsResponseDTO(List<Subject> ranking) {
+		this.ranking = ranking;
 	}
 	
 	public RankingCommentsResponseDTO() {
 		
 	}
 
-	public String toString() {
-		return id + " - " + name + " : comments = " + numComments;
+	public List<String> getRanking() {
+		List<String> result = new ArrayList<String>();
+		for (Subject subject : ranking) {
+			result.add(this.toString(subject));
+		}
+		
+		return result;
 	}
 	
-	public RankingCommentsResponseDTO toRanking(Subject subject) {
-		return new RankingCommentsResponseDTO(subject.getId(), subject.getName(), subject.getNumberOfComments());
+	public String toString(Subject subject) {
+		return subject.toString() + " : comments = " + subject.getNumberOfComments();
 	}
 }

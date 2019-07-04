@@ -9,6 +9,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,10 +38,14 @@ import com.psoft.UCDb.util.comparators.CommentsComparator;
 import com.psoft.UCDb.util.comparators.LikesComparator;
 
 import io.jsonwebtoken.Jwts;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 
 @RestController
 @RequestMapping({ "/v1/subject" })
+@Api(value="API REST Disciplinas")
+@CrossOrigin(origins="*")
 public class SubjectController {
 	private SubjectService subjectService;
 	@Autowired
@@ -54,6 +59,7 @@ public class SubjectController {
 	
 	@GetMapping(value = "/{id}")
 	@ResponseBody
+	@ApiOperation(value="Retorna uma disiciplina cadastrada a partir de seu ID")
 	public ResponseEntity<SubjectResponseDTO> findById(@RequestHeader("Authorization") String auth, @PathVariable int id) {
 		Subject subject = this.subjectService.findById(id);
 		
@@ -112,6 +118,7 @@ public class SubjectController {
 
 	@PostMapping(value = "/")
 	@ResponseBody
+	@ApiOperation(value="Cria uma disciplina")
 	public ResponseEntity<Subject> create(@RequestBody Subject subject) {
 		Subject newSubject = this.subjectService.create(subject);
 
@@ -125,6 +132,7 @@ public class SubjectController {
 	
 	@GetMapping(value = "/search/{pattern}")
 	@ResponseBody
+	@ApiOperation(value="Retorna uma lista de disciplinas que possuem a string de pesquisa como substring")
 	public ResponseEntity<SearchSubjectResponseDTO> search(@PathVariable String pattern) {
 		List<Subject> result = this.subjectService.findByPattern(pattern.toUpperCase());
 		
@@ -139,6 +147,7 @@ public class SubjectController {
 	
 	@PostMapping(value = "/{id}/comment/")
 	@ResponseBody
+	@ApiOperation(value="Adiciona um comentário a disciplina, cujo ID fora especificado no path")
 	public ResponseEntity<CommentResponseDTO> addComment(@RequestHeader("Authorization") String auth, @PathVariable int id, @RequestBody CommentDTO commentDTO) {
 		Comment comment = commentDTO.toComment();
 		
@@ -161,6 +170,7 @@ public class SubjectController {
 	
 	@GetMapping(value = "/{id}/like")
 	@ResponseBody
+	@ApiOperation(value="Adiciona um like , do usuário logado, na disciplina")
 	public ResponseEntity<SubjectResponseDTO> like(@RequestHeader("Authorization") String auth, @PathVariable int id){
 		Subject subject = this.subjectService.findById(id);
 		String email = Util.getEmailFromJWT(auth);
@@ -185,21 +195,23 @@ public class SubjectController {
 	
 	@GetMapping(value = "/ranking/likes")
 	@ResponseBody
-	public ResponseEntity<List<RankingLikesResponseDTO>> sortByLike(){
+	@ApiOperation(value="Retorna uma lista de disciplinas ordenadas quanto ao seu número de likes")
+	public ResponseEntity<RankingLikesResponseDTO> sortByLike(){
 		List<Subject> subjects = this.subjectService.getAllSubjects();
 		Collections.sort(subjects, new LikesComparator());
-		
-		return new ResponseEntity<List<RankingLikesResponseDTO>>(Util.convertRankingLike(subjects),HttpStatus.ACCEPTED);
+		RankingLikesResponseDTO response = new RankingLikesResponseDTO(subjects); 
+		return new ResponseEntity<RankingLikesResponseDTO>(response,HttpStatus.ACCEPTED);
 		
 	}
 	
 	@GetMapping(value = "/ranking/comments")
 	@ResponseBody
-	public ResponseEntity<List<RankingCommentsResponseDTO>> sortByComment(){
+	@ApiOperation(value="Retorna uma lista de disciplinas ordenadas quanto ao seu número de comentários")
+	public ResponseEntity<RankingCommentsResponseDTO> sortByComment(){
 		List<Subject> subjects = this.subjectService.getAllSubjects();
 		Collections.sort(subjects, new CommentsComparator());
-		
-		return new ResponseEntity<List<RankingCommentsResponseDTO>>(Util.convertRankingComment(subjects),HttpStatus.ACCEPTED);
+		RankingCommentsResponseDTO response = new RankingCommentsResponseDTO(subjects);
+		return new ResponseEntity<RankingCommentsResponseDTO>(response,HttpStatus.ACCEPTED);
 	}
 	
 	private String getEmailFromJWT(String auth) { 

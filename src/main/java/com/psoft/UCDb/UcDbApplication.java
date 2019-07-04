@@ -22,7 +22,7 @@ public class UcDbApplication {
 	public FilterRegistrationBean filterJwt() {
 		FilterRegistrationBean filterRb = new FilterRegistrationBean();
 		filterRb.setFilter(new TokenFilter());
-		filterRb.addUrlPatterns("/teste");
+		filterRb.addUrlPatterns("/v1/subject/{id}");
 		return filterRb;
 	}
 	

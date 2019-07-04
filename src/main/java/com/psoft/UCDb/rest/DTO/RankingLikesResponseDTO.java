@@ -1,30 +1,34 @@
 package com.psoft.UCDb.rest.DTO;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.psoft.UCDb.rest.model.Subject;
 
 import lombok.Getter;
 
 @Getter
 public class RankingLikesResponseDTO {
-	private int id;
-	private String name;
-	private int numLikes;
+	private List<Subject> ranking;
 	
-	public RankingLikesResponseDTO(int id, String name, int numLikes) {
-		this.id = id;
-		this.name = name;
-		this.numLikes = numLikes;
+	public RankingLikesResponseDTO(List<Subject> ranking) {
+		this.ranking = ranking;
 	}
 	
 	public RankingLikesResponseDTO() {
 		
 	}
 
-	public String toString() {
-		return id + " - " + name + " : likes = " + numLikes;
+	public List<String> getRanking() {
+		List<String> result = new ArrayList<String>();
+		for (Subject subject : ranking) {
+			result.add(this.toString(subject));
+		}
+		
+		return result;
 	}
 	
-	public RankingLikesResponseDTO toRanking(Subject subject) {
-		return new RankingLikesResponseDTO(subject.getId(), subject.getName(), subject.getNumberOfLikes());
+	public String toString(Subject subject) {
+		return subject.toString() + " : likes = " + subject.getNumberOfLikes();
 	}
 }

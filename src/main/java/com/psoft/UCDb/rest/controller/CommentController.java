@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,9 +25,13 @@ import com.psoft.UCDb.service.CommentService;
 import com.psoft.UCDb.service.UserService;
 
 import io.jsonwebtoken.Jwts;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping({ "/v1/comment" })
+@Api(value="API REST Comentários")
+@CrossOrigin(origins="*")
 public class CommentController {
 	@Autowired
 	private CommentService commentService;
@@ -39,6 +44,7 @@ public class CommentController {
 	
 	@PostMapping("/{id}")
 	@ResponseBody
+	@ApiOperation(value="Adiciona um comentário a outro comentário")
 	public ResponseEntity<CommentResponseDTO> addComment(@RequestHeader("Authorization") String auth,@PathVariable int id, @RequestBody CommentDTO commentDTO){
 		Comment comment = commentDTO.toComment();
 		User user = this.userService.findByEmail(this.getEmailFromJWT(auth));
@@ -51,6 +57,7 @@ public class CommentController {
 	
 	@GetMapping("/{id}")
 	@ResponseBody
+	@ApiOperation(value="Retorna uma lista de comentários filhos do comentário cujo ID fora especificado no path")
 	public ResponseEntity<List<CommentResponseDTO>> getComments(@PathVariable int id){
 		List<Comment> comments = commentService.findByParentId(id);
 		System.out.println(comments.toArray());
@@ -69,6 +76,7 @@ public class CommentController {
 	}
 	
 	@DeleteMapping("/{id}")
+	@ApiOperation(value="Deleta um comentário com base no seu ID")
 	public void deleteCOmment(@PathVariable int id) {
 		this.commentService.delete(id);
 	}
